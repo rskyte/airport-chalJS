@@ -2,12 +2,10 @@
 describe("Airport", function() {
   var airport;
   var plane;
-  var plane2;
   var weather;
 
   beforeEach(function () {
-    plane = new Plane();
-    plane2 = new Plane();
+    plane = jasmine.createSpyObj('plane', ['land', 'takeoff'])
     weather = {
       isStormy: function() {
         return false
@@ -24,11 +22,10 @@ it("should save the plane in a list of planes", function() {
   expect(airport.planes).toEqual([plane])
 })
 
-it("allows specific planes to takeoff", function() {
+it("allows planes to takeoff", function() {
   airport.land(plane)
-  airport.land(plane2)
   airport.takeoff(plane)
-  expect(airport.planes).toEqual([plane2])
+  expect(airport.planes.length).toEqual(0)
 })
 
 it("planes cannot take off when the weather is stormy", function() {
@@ -41,6 +38,16 @@ it("planes cannot take off when the weather is stormy", function() {
     airport.takeoff(plane);
   }
   expect(stormyTakeoff).toThrowError("Too stormy to takeoff!")
+})
+
+it("planes cannot land if airport is at max capacity", function() {
+  for(i=0;i<20;i++) {
+    airport.land(plane)
+  }
+  var fullLanding = function() {
+    airport.land(plane);
+  }
+  expect(fullLanding).toThrowError("Airport too full!")
 })
 
 })
